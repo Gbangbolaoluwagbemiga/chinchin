@@ -490,3 +490,221 @@ select.input-field {
 .mb-4 {
   margin-bottom: 2rem !important;
 }
+
+/* --- CRAZY FEATURES START --- */
+
+/* 1. Market Pulse Ticker */
+.marquee-container {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.5rem 0;
+  position: relative;
+  z-index: 99;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: scroll-left 25s linear infinite;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 3rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+  /* Tech feel */
+}
+
+.ticker-highlight {
+  color: var(--primary-light);
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* 2. 3D Holographic Reputation Card */
+.holographic-container {
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+}
+
+.holographic-card-wrapper {
+  transition: transform 0.1s;
+  transform-style: preserve-3d;
+  width: 100%;
+}
+
+/* Overwrite the default flat card for this special context if needed, 
+   but here we modify the standard .reputation-card when inside the wrapper */
+.holographic-card-wrapper .reputation-card {
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(20px);
+  /* Pop out a bit */
+}
+
+/* The holographic sheen */
+.holographic-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(105deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.1) 25%,
+      transparent 30%);
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: holo-sweep 6s infinite linear;
+}
+
+@keyframes holo-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateX(150%) skewX(-15deg);
+  }
+}
+
+/* 3. Glitch Text Effect */
+.glitch-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text {
+  position: relative;
+  color: var(--text-primary);
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+  /* Match background to hide main text */
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -1px 0 #ff00c1;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim-1 5s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -1px 0 #00fff9;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim-2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+  0% {
+    clip: rect(30px, 9999px, 10px, 0);
+  }
+
+  20% {
+    clip: rect(15px, 9999px, 80px, 0);
+  }
+
+  40% {
+    clip: rect(50px, 9999px, 90px, 0);
+  }
+
+  60% {
+    clip: rect(5px, 9999px, 30px, 0);
+  }
+
+  80% {
+    clip: rect(70px, 9999px, 20px, 0);
+  }
+
+  100% {
+    clip: rect(10px, 9999px, 100px, 0);
+  }
+}
+
+@keyframes glitch-anim-2 {
+  0% {
+    clip: rect(15px, 9999px, 80px, 0);
+  }
+
+  20% {
+    clip: rect(70px, 9999px, 10px, 0);
+  }
+
+  40% {
+    clip: rect(5px, 9999px, 40px, 0);
+  }
+
+  60% {
+    clip: rect(60px, 9999px, 20px, 0);
+  }
+
+  80% {
+    clip: rect(30px, 9999px, 50px, 0);
+  }
+
+  100% {
+    clip: rect(80px, 9999px, 10px, 0);
+  }
+}
+
+/* 4. Neon Buttons */
+.btn-neon {
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+  z-index: 1;
+}
+
+.btn-neon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.btn-neon:hover::before {
+  left: 100%;
+}
+
+.btn-neon:hover {
+  box-shadow: 0 0 20px var(--primary);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
