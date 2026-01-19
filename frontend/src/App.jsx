@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
+import confetti from 'canvas-confetti';
 import './App.css';
 
 // Contract ABIs (simplified - include essential functions)
@@ -33,6 +34,60 @@ const TRUST_CIRCLE_ABI = [
   "function acceptInvitation(uint256 circleId) external",
   "function vouchForMember(uint256 circleId, address member) external"
 ];
+
+// --- CRAZY COMPONENTS ---
+
+const MarketPulse = () => {
+  return (
+    <div className="marquee-container">
+      <div className="marquee-content">
+        <span className="ticker-item">🔴 LIVE: <span className="ticker-highlight">User 0x8a...2b just borrowed 5.0 ETH</span></span>
+        <span className="ticker-item">💎 INFO: <span className="ticker-highlight">TrustCircle TVL reaches $1.2M</span></span>
+        <span className="ticker-item">🚀 NEW: <span className="ticker-highlight">Diamond Tier unlocked by User 0x9f...11</span></span>
+        <span className="ticker-item">📊 RATE: <span className="ticker-highlight">Base interest rate adjusted to 4.2%</span></span>
+        <span className="ticker-item">🤝 SOCIAL: <span className="ticker-highlight">New Trust Circle "DeFi Whales" created</span></span>
+        <span className="ticker-item">🔴 LIVE: <span className="ticker-highlight">User 0x3c...9d repaid loan early (+50 Rep)</span></span>
+      </div>
+    </div>
+  );
+};
+
+const HolographicCard = ({ children }) => {
+  const [transform, setTransform] = useState('');
+
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Calculate rotation based on mouse position
+    const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg tilt
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);
+  };
+
+  const handleMouseLeave = () => {
+    setTransform('');
+  };
+
+  return (
+    <div className="holographic-container">
+      <div
+        className="holographic-card-wrapper"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ transform }}
+      >
+        <div className="holographic-overlay"></div>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const [account, setAccount] = useState(null);
@@ -167,6 +222,11 @@ function App() {
       await loadUserData(account);
       setLoading(false);
       setTxHash('');
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
       alert('Reputation NFT minted successfully!');
     } catch (error) {
       console.error('Error minting:', error);
@@ -215,6 +275,12 @@ function App() {
       await loadUserData(account);
       setLoading(false);
       setTxHash('');
+      confetti({
+        particleCount: 100,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#10B981', '#34D399'] // Green tones for repayment
+      });
       alert('Loan repaid successfully!');
     } catch (error) {
       console.error('Error repaying:', error);
@@ -297,6 +363,12 @@ function App() {
       setCircleName('');
       setLoading(false);
       setTxHash('');
+      confetti({
+        particleCount: 120,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#8B5CF6', '#C4B5FD'] // Purple tones for circles
+      });
       alert('Trust circle created!');
     } catch (error) {
       console.error('Error creating circle:', error);
@@ -310,8 +382,11 @@ function App() {
     <div className="app">
       {/* Header */}
       <header className="header">
+        <MarketPulse />
         <div className="header-content">
-          <h1 className="logo gradient-text">TrustCircle</h1>
+          <h1 className="logo gradient-text glitch-wrapper">
+            <span className="glitch-text" data-text="TrustCircle">TrustCircle</span>
+          </h1>
           <div className="wallet-info">
             <button
               className="theme-toggle-btn"
@@ -413,50 +488,52 @@ function App() {
                   <div className="glass-card text-center">
                     <h2>Welcome to TrustCircle!</h2>
                     <p className="text-secondary mb-4">Mint your Reputation NFT to get started</p>
-                    <button className="btn btn-primary" onClick={mintReputation} disabled={loading}>
+                    <button className="btn btn-primary btn-neon" onClick={mintReputation} disabled={loading}>
                       {loading ? 'Minting...' : 'Mint Reputation NFT'}
                     </button>
                   </div>
                 ) : (
                   <>
                     {/* Reputation Card */}
-                    <div className="glass-card reputation-card">
-                      <h2 className="card-title">Your Reputation</h2>
-                      <div className="reputation-display">
-                        <div className="reputation-score">
-                          <div
-                            className="score-circle"
-                            style={{
-                              background: `linear-gradient(135deg, ${tierColors[reputationData.tier]}, ${tierColors[reputationData.tier]}99)`,
-                              boxShadow: `0 0 40px ${tierColors[reputationData.tier]}66`
-                            }}
-                          >
-                            <span className="score-value">{reputationData.score}</span>
+                    <HolographicCard>
+                      <div className="glass-card reputation-card">
+                        <h2 className="card-title">Your Reputation</h2>
+                        <div className="reputation-display">
+                          <div className="reputation-score">
+                            <div
+                              className="score-circle"
+                              style={{
+                                background: `linear-gradient(135deg, ${tierColors[reputationData.tier]}, ${tierColors[reputationData.tier]}99)`,
+                                boxShadow: `0 0 40px ${tierColors[reputationData.tier]}66`
+                              }}
+                            >
+                              <span className="score-value">{reputationData.score}</span>
+                            </div>
+                            <div className="tier-badge" style={{ color: tierColors[reputationData.tier] }}>
+                              {tierNames[reputationData.tier]} Tier
+                            </div>
                           </div>
-                          <div className="tier-badge" style={{ color: tierColors[reputationData.tier] }}>
-                            {tierNames[reputationData.tier]} Tier
-                          </div>
-                        </div>
-                        <div className="reputation-stats">
-                          <div className="stat-item">
-                            <span className="stat-label">Loans Completed</span>
-                            <span className="stat-value">{reputationData.loansCompleted}</span>
-                          </div>
-                          <div className="stat-item">
-                            <span className="stat-label">Total Borrowed</span>
-                            <span className="stat-value">{parseFloat(reputationData.totalBorrowed).toFixed(2)} ETH</span>
-                          </div>
-                          <div className="stat-item">
-                            <span className="stat-label">Total Repaid</span>
-                            <span className="stat-value">{parseFloat(reputationData.totalRepaid).toFixed(2)} ETH</span>
-                          </div>
-                          <div className="stat-item">
-                            <span className="stat-label">Trust Circles</span>
-                            <span className="stat-value">{reputationData.circles}</span>
+                          <div className="reputation-stats">
+                            <div className="stat-item">
+                              <span className="stat-label">Loans Completed</span>
+                              <span className="stat-value">{reputationData.loansCompleted}</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">Total Borrowed</span>
+                              <span className="stat-value">{parseFloat(reputationData.totalBorrowed).toFixed(2)} ETH</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">Total Repaid</span>
+                              <span className="stat-value">{parseFloat(reputationData.totalRepaid).toFixed(2)} ETH</span>
+                            </div>
+                            <div className="stat-item">
+                              <span className="stat-label">Trust Circles</span>
+                              <span className="stat-value">{reputationData.circles}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </HolographicCard>
 
                     {/* Quick Stats */}
                     <div className="grid grid-3">
